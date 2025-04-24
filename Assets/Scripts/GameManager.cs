@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -27,8 +28,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // Automatically start the tutorial when the scene loads
-        tutorialManager.StartTutorial();
+        tutorialManager.StartTutorial(); // This line is tutorial-specific
     }
 
     // Called when a card is revealed

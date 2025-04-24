@@ -5,20 +5,26 @@ using TMPro;
 public class Card : MonoBehaviour
 {
     public string letter;
-    public bool isRevealed = false;
     public Button button;
+    public TMP_Text cardText;
+
+    public Sprite[] possibleSprites;
+    public Image frontImage;
+
+    private bool isRevealed = false;
 
     public void RevealCard()
     {
         if (isRevealed) return;
+
         isRevealed = true;
-        button.GetComponentInChildren<TMP_Text>().text = letter;
-        GameManager.instance.CardRevealed(this);
+        cardText.text = letter;
+        GameManager_Game.instance.CardRevealed(this);
     }
 
     public void HideCard()
     {
         isRevealed = false;
-        button.GetComponentInChildren<TMP_Text>().text = "?";
+        cardText.text = "?";
     }
 }

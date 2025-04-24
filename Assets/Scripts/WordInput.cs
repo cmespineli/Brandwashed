@@ -57,4 +57,10 @@ public class WordInput : MonoBehaviour
         currentIndex = 0;
         feedback.text = "";
     }
+    public void SetCorrectWord(string word)
+    {
+        correctWord = word.ToUpper();
+        ResetInput();
+    }
+
 }
