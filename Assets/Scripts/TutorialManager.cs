@@ -1,6 +1,8 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 using UnityEngine.UI;
+using TMPro;
 
 public class TutorialManager : MonoBehaviour
 {
@@ -15,10 +17,16 @@ public class TutorialManager : MonoBehaviour
     private string[] messages = new string[]
     {
         "Match two cards to reveal a letter!",
-        "Each matched pair gives you a usable letter.",
-        "Use those letters to fill in the riddle answer!",
-        "Click letter buttons to guess the word!"
+        "Keep matching cards until they're all gone!",
+        "Use the letter buttons to guess the word!"
     };
+
+    public static TutorialManager instance;
+
+    void Awake()
+    {
+        instance = this;
+    }
 
     public void StartTutorial()
     {
@@ -29,6 +37,8 @@ public class TutorialManager : MonoBehaviour
     public void NextStep()
     {
         step++;
+        nextButton.gameObject.SetActive(false); // hide after advancing
+
         if (step < messages.Length)
             ShowStep();
         else
@@ -38,9 +48,15 @@ public class TutorialManager : MonoBehaviour
     void ShowStep()
     {
         tutorialText.text = messages[step];
+        nextButton.gameObject.SetActive(false); // always hide initially
 
-        // Example logic to switch UI views based on tutorial step
         if (step == 0)
+        {
+            cardGrid.SetActive(true);
+            wordInputPanel.SetActive(false);
+            buttonPanel.SetActive(false);
+        }
+        else if (step == 1)
         {
             cardGrid.SetActive(true);
             wordInputPanel.SetActive(false);
@@ -49,16 +65,29 @@ public class TutorialManager : MonoBehaviour
         else if (step == 2)
         {
             cardGrid.SetActive(false);
-            buttonPanel.SetActive(true);
             wordInputPanel.SetActive(true);
+            buttonPanel.SetActive(true);
         }
+    }
 
-        nextButton.gameObject.SetActive(true); // ✅ FIXED!
+    public void ShowNextButton()
+    {
+        nextButton.gameObject.SetActive(true);
+    }
+
+    public int GetCurrentStep()
+    {
+        return step;
+    }
+
+    public bool CurrentStepIs(int index)
+    {
+        return step == index;
     }
 
     void EndTutorial()
     {
         tutorialText.text = "";
-        nextButton.gameObject.SetActive(false); // ✅ Also good
+        nextButton.gameObject.SetActive(false);
     }
 }

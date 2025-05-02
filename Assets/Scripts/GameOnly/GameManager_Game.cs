@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+
 public class GameManager_Game : MonoBehaviour
 {
     public static GameManager_Game instance;
@@ -14,7 +15,7 @@ public class GameManager_Game : MonoBehaviour
     public Transform buttonPanel;
     public RiddleManager riddleManager;
 
-    private Card firstCard, secondCard;
+    private Card_Game firstCard, secondCard;
 
     void Awake()
     {
@@ -26,7 +27,7 @@ public class GameManager_Game : MonoBehaviour
         riddleManager.LoadNewRiddle();
     }
 
-    public void CardRevealed(Card card)
+    public void CardRevealed(Card_Game card)
     {
         if (firstCard == null)
         {
@@ -70,23 +71,16 @@ public class GameManager_Game : MonoBehaviour
     }
 
     public void SetupCards(string word)
-    {
+        {
         List<char> letters = new List<char>(word.ToUpper());
-        letters.AddRange(letters);
-        letters = letters.OrderBy(x => Random.value).ToList();
+        letters.AddRange(letters); // create pairs
+        letters = letters.OrderBy(x => Random.value).ToList(); // shuffle
 
         for (int i = 0; i < cardGrid.childCount; i++)
         {
-            Card card = cardGrid.GetChild(i).GetComponent<Card>();
+            Card_Game card = cardGrid.GetChild(i).GetComponent<Card_Game>();
             card.letter = letters[i].ToString();
-
-            if (card.possibleSprites != null && card.possibleSprites.Length > 0)
-            {
-                int index = Random.Range(0, card.possibleSprites.Length);
-                card.frontImage.sprite = card.possibleSprites[index];
-            }
-
-            card.HideCard();
+            card.HideCard(); // reset display
         }
     }
 }

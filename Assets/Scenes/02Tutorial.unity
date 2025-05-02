@@ -1863,11 +1863,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6816d169f13aed846a4cc06a8940febc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardPrefab: {fileID: 6588416001079271681, guid: 26b752b52e867244288161e9391f2068, type: 3}
   cardGrid: {fileID: 1925608602}
   letterButtonPrefab: {fileID: 6215474026651108080, guid: 49f9d8aea928bc740aeb307b77364adb, type: 3}
   buttonPanel: {fileID: 2140926316}
-  tutorialManager: {fileID: 1173418931}
 --- !u!1 &1189176213
 GameObject:
   m_ObjectHideFlags: 0
@@ -2670,10 +2668,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Welcome to Brandwashed! Match cards to collect letters.
+  m_text: Welcome to Brandwashed!
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
-  m_sharedMaterial: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 18d59fa0ae384c84d829fdef35c3837d, type: 2}
+  m_sharedMaterial: {fileID: 3472480296686134294, guid: 18d59fa0ae384c84d829fdef35c3837d, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2733,7 +2731,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0.64356995}
+  m_margin: {x: 0, y: 50.962097, z: 0, w: 0.64356995}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

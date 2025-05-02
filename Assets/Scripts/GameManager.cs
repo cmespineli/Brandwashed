@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -8,39 +7,30 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    [Header("Card Matching")]
-    public GameObject cardPrefab;              // Optional: used if you're spawning cards
-    public Transform cardGrid;                 // The GridLayout that holds cards
-
-    [Header("Letter Button Creation")]
-    public GameObject letterButtonPrefab;      // The prefab for letter buttons
-    public Transform buttonPanel;              // The panel where letter buttons are placed
-
-    [Header("Tutorial")]
-    public TutorialManager tutorialManager;    // Reference to tutorial system
+    public Transform cardGrid;
+    public GameObject letterButtonPrefab;
+    public Transform buttonPanel;
 
     private Card firstCard, secondCard;
+    private bool canReveal = true;
 
     void Awake()
     {
         instance = this;
     }
 
-    void Start()
-    {
-        tutorialManager.StartTutorial(); // This line is tutorial-specific
-    }
-
-    // Called when a card is revealed
     public void CardRevealed(Card card)
     {
+        if (!canReveal) return;
+
         if (firstCard == null)
         {
             firstCard = card;
         }
-        else
+        else if (secondCard == null)
         {
             secondCard = card;
+            canReveal = false;
             StartCoroutine(CheckMatch());
         }
     }
@@ -54,6 +44,21 @@ public class GameManager : MonoBehaviour
             CreateLetterButton(firstCard.letter);
             Destroy(firstCard.gameObject);
             Destroy(secondCard.gameObject);
+
+            // ✅ Step 0: Show Next after first match
+            if (TutorialManager.instance != null && TutorialManager.instance.CurrentStepIs(0))
+            {
+                TutorialManager.instance.ShowNextButton();
+            }
+
+            // ✅ Step 1: Show Next after all cards are matched
+            if (TutorialManager.instance != null && TutorialManager.instance.CurrentStepIs(1))
+            {
+                if (cardGrid.childCount <= 2) // only these 2 cards left
+                {
+                    TutorialManager.instance.ShowNextButton();
+                }
+            }
         }
         else
         {
@@ -63,9 +68,9 @@ public class GameManager : MonoBehaviour
 
         firstCard = null;
         secondCard = null;
+        canReveal = true;
     }
 
-    // Creates a letter button that players can use to guess the riddle
     void CreateLetterButton(string letter)
     {
         GameObject newButton = Instantiate(letterButtonPrefab, buttonPanel);
