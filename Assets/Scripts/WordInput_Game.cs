@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -14,6 +15,7 @@ public class WordInput_Game : MonoBehaviour
     [Header("Word Logic")]
     public string correctWord;
     private int currentIndex = 0;
+    private bool isChecking = false;
 
     void Awake()
     {
@@ -28,29 +30,26 @@ public class WordInput_Game : MonoBehaviour
 
     public void AddLetter(string letter)
     {
-        if (currentIndex >= inputSlots.Count)
-        {
-            Debug.LogWarning("Attempted to add letter beyond slot count.");
-            return;
-        }
+        if (currentIndex >= inputSlots.Count || isChecking) return;
 
-        if (inputSlots[currentIndex] == null)
+        if (inputSlots[currentIndex] != null)
         {
-            Debug.LogError("Input slot " + currentIndex + " is null!");
-            return;
-        }
-
-        inputSlots[currentIndex].text = letter.Trim();
-        currentIndex++;
-
-        if (currentIndex == inputSlots.Count)
-        {
-            CheckAnswer();
+            inputSlots[currentIndex].text = letter.Trim();
+            currentIndex++;
         }
     }
 
-    void CheckAnswer()
+    public void SubmitWord()
     {
+        if (currentIndex < inputSlots.Count || isChecking) return;
+
+        StartCoroutine(CheckAnswerRoutine());
+    }
+
+    IEnumerator CheckAnswerRoutine()
+    {
+        isChecking = true;
+
         string attempt = "";
         foreach (TMP_Text t in inputSlots)
         {
@@ -59,26 +58,29 @@ public class WordInput_Game : MonoBehaviour
 
         if (attempt.ToUpper() == correctWord)
         {
-            feedbackText.text = "✅ Correct!";
-            TimerManager.instance.ResetTimer();
+            feedbackText.text = "CORRECT.";
+            ScoreManager_Game.instance.AddPoints(500); // ✅ Add riddle points
+            yield return new WaitForSeconds(2f);
 
-            // Hide riddle-related UI
-            gameObject.SetActive(false); // WordInput_Game
+            // Hide riddle UI
+            gameObject.SetActive(false);
             GameManager_Game.instance.buttonPanel.gameObject.SetActive(false);
-            GameManager_Game.instance.riddleManager.riddleText.gameObject.SetActive(false); // Hide riddle text
+            GameManager_Game.instance.riddleManager.riddleText.gameObject.SetActive(false);
             inputControlsPanel.SetActive(false);
 
-            // Show cards again
+            // Show cards and move on
             GameManager_Game.instance.cardGrid.gameObject.SetActive(true);
-
-            // Start next round
             GameManager_Game.instance.StartNextRound();
         }
         else
         {
-            feedbackText.text = "❌ Try Again!";
+            feedbackText.text = "REDACTED.";
             HPManager_Game.instance.TakeDamage();
+            yield return new WaitForSeconds(2f);
+            feedbackText.text = "";
         }
+
+        isChecking = false;
     }
 
     public void ResetInput()
@@ -94,7 +96,7 @@ public class WordInput_Game : MonoBehaviour
 
     public void DeleteLetter()
     {
-        if (currentIndex > 0)
+        if (currentIndex > 0 && !isChecking)
         {
             currentIndex--;
             inputSlots[currentIndex].text = "";
@@ -104,10 +106,5 @@ public class WordInput_Game : MonoBehaviour
     public void ClearAll()
     {
         ResetInput();
-    }
-
-    public void SubmitWord()
-    {
-        CheckAnswer();
     }
 }

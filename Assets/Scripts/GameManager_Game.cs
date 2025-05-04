@@ -20,6 +20,7 @@ public class GameManager_Game : MonoBehaviour
     private List<Card_Game> allCards = new List<Card_Game>();
     private Card_Game firstCard, secondCard;
     private int matchCount = 0;
+    private bool canClick = true; // 🔒 Prevents triple-click
 
     void Awake()
     {
@@ -42,15 +43,15 @@ public class GameManager_Game : MonoBehaviour
             Card_Game card = child.GetComponent<Card_Game>();
             if (card != null)
             {
-                card.gameObject.SetActive(true); // Ensure reactivated
+                card.gameObject.SetActive(true);
                 allCards.Add(card);
             }
         }
 
-        // Shuffle and assign 5 letter pairs to the cards
+        // Shuffle and assign 5 letter pairs
         List<char> letters = new List<char>(word.ToUpper());
-        letters.AddRange(letters); // create pairs
-        letters = letters.OrderBy(x => Random.value).ToList(); // shuffle
+        letters.AddRange(letters);
+        letters = letters.OrderBy(x => Random.value).ToList();
 
         for (int i = 0; i < allCards.Count; i++)
         {
@@ -62,7 +63,6 @@ public class GameManager_Game : MonoBehaviour
             }
             else
             {
-                // Hide extra cards if you have more than 10 in the grid
                 allCards[i].gameObject.SetActive(false);
             }
         }
@@ -72,6 +72,8 @@ public class GameManager_Game : MonoBehaviour
 
     public void CardRevealed(Card_Game card)
     {
+        if (!canClick) return; // ❌ prevent mid-check clicks
+
         if (firstCard == null)
         {
             firstCard = card;
@@ -79,13 +81,14 @@ public class GameManager_Game : MonoBehaviour
         else if (secondCard == null && card != firstCard)
         {
             secondCard = card;
+            canClick = false; // 🔒 lock further input
             StartCoroutine(CheckMatch());
         }
     }
 
     IEnumerator CheckMatch()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f); // faster check
 
         if (firstCard.letter == secondCard.letter && !string.IsNullOrEmpty(firstCard.letter))
         {
@@ -97,7 +100,7 @@ public class GameManager_Game : MonoBehaviour
 
             if (matchCount >= 5)
             {
-                yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSeconds(0.25f);
                 riddleManager.ShowRiddleUI();
             }
         }
@@ -109,6 +112,7 @@ public class GameManager_Game : MonoBehaviour
 
         firstCard = null;
         secondCard = null;
+        canClick = true; // 🔓 allow new flips
     }
 
     public void CreateLetterButton(string letter)

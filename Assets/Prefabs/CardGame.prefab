@@ -102,7 +102,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6588416001079271681, guid: 26b752b52e867244288161e9391f2068, type: 3}
       propertyPath: m_Name
-      value: Card Variant
+      value: CardGame
+      objectReference: {fileID: 0}
+    - target: {fileID: 7425241521619356408, guid: 26b752b52e867244288161e9391f2068, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 4072163187236148976, guid: 26b752b52e867244288161e9391f2068, type: 3}
