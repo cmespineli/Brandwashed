@@ -1,3 +1,6 @@
+// =====================
+// TutorialManager.cs
+// =====================
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +10,8 @@ using TMPro;
 
 public class TutorialManager : MonoBehaviour
 {
+    public static TutorialManager instance;
+
     public TMP_Text tutorialText;
     public TMP_Text tutorialTextRect;
     public Button nextButton;
@@ -29,8 +34,6 @@ public class TutorialManager : MonoBehaviour
         "Are you ready to try it for real?"
     };
 
-    public static TutorialManager instance;
-
     void Awake()
     {
         instance = this;
@@ -39,7 +42,6 @@ public class TutorialManager : MonoBehaviour
     public void StartTutorial()
     {
         step = 0;
-
         cardGrid.SetActive(false);
         wordInputPanel.SetActive(false);
         buttonPanel.SetActive(false);
@@ -47,7 +49,6 @@ public class TutorialManager : MonoBehaviour
         inputControlsPanel.SetActive(false);
         tutorialText.gameObject.SetActive(false);
         tutorialTextRect.gameObject.SetActive(false);
-
         ShowStep();
     }
 
@@ -66,7 +67,13 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
-    void ShowStep()
+    public void AdvanceToRiddleStage(List<string> matchedLetters)
+    {
+        step = 4;
+        ShowStep(matchedLetters);
+    }
+
+    public void ShowStep(List<string> matchedLetters = null)
     {
         tutorialText.text = "";
         tutorialTextRect.text = "";
@@ -91,6 +98,7 @@ public class TutorialManager : MonoBehaviour
             tutorialText.gameObject.SetActive(true);
             tutorialText.text = messages[step];
             cardGrid.SetActive(true);
+            GameManager.instance.EnableAllUnlockedCards();
         }
         else if (step == 3)
         {
@@ -107,18 +115,8 @@ public class TutorialManager : MonoBehaviour
             buttonPanel.SetActive(true);
             riddleText.SetActive(true);
             inputControlsPanel.SetActive(true);
-
-            riddleText.GetComponent<TMP_Text>().text =
-                "I come in pairs but never walk, I spell solutions but never talk. What am I?";
-
-            if (WordInput.instance != null)
-            {
-                WordInput.instance.EnableLetterButtons(GameManager.instance.matchedLetters);
-            }
-            else
-            {
-                Debug.LogWarning("WordInput.instance was null at Step 4.");
-            }
+            riddleText.GetComponent<TMP_Text>().text = "I come in pairs but never walk, I spell solutions but never talk. What am I?";
+            WordInput.instance.EnableLetterButtons(matchedLetters);
         }
         else if (step == 5)
         {
@@ -128,21 +126,21 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
-    public void ShowNextButton()
+    public void ShowPraiseThenNext(string message)
     {
-        nextButton.gameObject.SetActive(true);
+        StartCoroutine(PraiseRoutine(message));
     }
 
-    public void ShowGoodJobThenNext(string message)
-    {
-        StartCoroutine(ShowPraiseThenNext(message));
-    }
-
-    IEnumerator ShowPraiseThenNext(string message)
+    IEnumerator PraiseRoutine(string message)
     {
         tutorialText.text = message;
         yield return new WaitForSeconds(1.2f);
         ShowNextButton();
+    }
+
+    public void ShowNextButton()
+    {
+        nextButton.gameObject.SetActive(true);
     }
 
     public bool CurrentStepIs(int i)

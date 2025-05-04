@@ -1,149 +1,104 @@
+// =====================
+// GameManager.cs
+// =====================
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    public Transform cardGrid;
-    public List<Card> cards = new List<Card>();
-    public List<char> matchedLetters = new List<char>();
+    public RectTransform cardGrid;
+    private List<Card> allCards = new List<Card>();
+    private List<Card> revealedCards = new List<Card>();
 
-    private Card firstCard;
-    private Card secondCard;
-
-    private int totalMatches;
-    private int matchesFound;
-    private int step3MatchesFound;
-
-    private bool hasMatchedFirstPair = false;
-    private bool matchingDisabled = false;
+    private char[] letterPool = { 'C', 'A', 'R', 'D', 'S', 'C', 'A', 'R', 'D', 'S' };
+    private HashSet<char> matchedLetters = new HashSet<char>();
 
     void Awake()
     {
         instance = this;
+        InitializeCards();
     }
 
-    void Start()
+    void InitializeCards()
     {
-        AssignLettersToExistingCards();
+        allCards = cardGrid.GetComponentsInChildren<Card>().ToList();
+        var shuffled = letterPool.OrderBy(x => Random.value).ToArray();
+
+        for (int i = 0; i < allCards.Count; i++)
+        {
+            allCards[i].SetLetter(shuffled[i]);
+            allCards[i].SetInteractable(false);
+        }
     }
 
-    void AssignLettersToExistingCards()
+    public void EnableAllUnlockedCards()
     {
-        string letters = "CARDSCARDS";
-        List<char> charList = new List<char>(letters.ToCharArray());
-
-        for (int i = 0; i < charList.Count; i++)
+        foreach (Card card in allCards)
         {
-            int rnd = Random.Range(i, charList.Count);
-            char temp = charList[i];
-            charList[i] = charList[rnd];
-            charList[rnd] = temp;
+            card.SetInteractable(true);
         }
-
-        cards.Clear();
-        matchedLetters.Clear();
-        int index = 0;
-        foreach (Transform child in cardGrid)
-        {
-            Card card = child.GetComponent<Card>();
-            if (card != null && index < charList.Count)
-            {
-                char letter = charList[index++];
-                card.AssignLetter(letter.ToString());
-                card.gameObject.SetActive(true);
-                card.Unlock();
-                cards.Add(card);
-            }
-        }
-
-        totalMatches = cards.Count / 2;
-        matchesFound = 0;
-        step3MatchesFound = 0;
-        hasMatchedFirstPair = false;
-        matchingDisabled = false;
     }
 
-    public void CardRevealed(Card card)
+    public void OnCardRevealed(Card card)
     {
-        if (matchingDisabled || firstCard == card) return;
+        if (revealedCards.Contains(card)) return;
 
-        if (firstCard == null)
-        {
-            firstCard = card;
-        }
-        else if (secondCard == null)
-        {
-            secondCard = card;
+        revealedCards.Add(card);
+
+        if (revealedCards.Count == 2)
             StartCoroutine(CheckMatch());
-        }
     }
 
     IEnumerator CheckMatch()
     {
         yield return new WaitForSeconds(0.5f);
 
-        if (firstCard.GetLetter() == secondCard.GetLetter())
+        Card card1 = revealedCards[0];
+        Card card2 = revealedCards[1];
+
+        if (card1.GetLetter() == card2.GetLetter())
         {
-            firstCard.Lock();
-            secondCard.Lock();
-            matchesFound++;
+            card1.Lock();
+            card2.Lock();
+            matchedLetters.Add(card1.GetLetter());
 
-            char matchedChar = firstCard.GetLetter();
-            if (!matchedLetters.Contains(matchedChar))
+            if (TutorialManager.instance.CurrentStepIs(2))
             {
-                matchedLetters.Add(matchedChar);
-            }
-
-            if (TutorialManager.instance != null)
-            {
-                if (!hasMatchedFirstPair && TutorialManager.instance.CurrentStepIs(2))
+                foreach (Card card in allCards)
                 {
-                    hasMatchedFirstPair = true;
-                    matchingDisabled = true;
-
-                    foreach (Card card in cards)
-                    {
-                        if (card != firstCard && card != secondCard)
-                        {
-                            card.Lock();
-                        }
-                    }
-
-                    TutorialManager.instance.ShowGoodJobThenNext("Good job!");
+                    if (!card.IsLocked()) card.SetInteractable(false);
                 }
-                else if (TutorialManager.instance.CurrentStepIs(3))
+                TutorialManager.instance.ShowPraiseThenNext("Good job!");
+            }
+            else if (TutorialManager.instance.CurrentStepIs(3))
+            {
+                bool allMatched = allCards.All(c => c.IsLocked());
+                if (allMatched)
                 {
-                    step3MatchesFound++;
-
-                    if (step3MatchesFound == totalMatches - 1)
-                    {
-                        TutorialManager.instance.ShowGoodJobThenNext("Great work!");
-                    }
+                    TutorialManager.instance.ShowPraiseThenNext("Great work!");
                 }
             }
         }
         else
         {
-            firstCard.ResetCard();
-            secondCard.ResetCard();
+            card1.HideLetter();
+            card2.HideLetter();
         }
 
-        firstCard = null;
-        secondCard = null;
+        revealedCards.Clear();
+
+        if (matchedLetters.Count >= 5 && TutorialManager.instance.CurrentStepIs(3))
+        {
+            TutorialManager.instance.AdvanceToRiddleStage(matchedLetters.Select(c => c.ToString()).ToList());
+        }
     }
 
-    public void EnableAllUnlockedCards()
+    public List<char> GetMatchedLetters()
     {
-        foreach (Card card in cards)
-        {
-            card.Unlock();
-            card.ResetCard();
-        }
-
-        matchingDisabled = false;
+        return matchedLetters.ToList();
     }
 }

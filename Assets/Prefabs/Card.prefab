@@ -135,10 +135,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   letter: 
-  frontImage: {fileID: 0}
-  backImage: {fileID: 0}
-  letterText: {fileID: 0}
+  letterText: {fileID: 7425241521619356408}
   button: {fileID: 0}
+  isMatched: 0
 --- !u!1 &7922762602812615268
 GameObject:
   m_ObjectHideFlags: 0

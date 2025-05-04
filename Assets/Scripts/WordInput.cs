@@ -2,86 +2,81 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System.Linq;
 
 public class WordInput : MonoBehaviour
 {
     public static WordInput instance;
 
-    public TMP_Text[] letterSlots;
-    public TMP_Text feedbackText;
+    public List<Button> letterButtons;
+    public TMP_Text resultText;
+    private string inputWord = "";
+    private string correctAnswer = "CARDS";
 
-    private int currentIndex = 0;
-
-    void OnEnable()
+    void Awake()
     {
         instance = this;
     }
 
     public void AddLetter(string letter)
     {
-        if (currentIndex < letterSlots.Length)
+        if (inputWord.Length < 5)
         {
-            letterSlots[currentIndex].text = letter;
-            currentIndex++;
+            inputWord += letter;
+            UpdateResultText();
         }
     }
 
-    public void DeleteLastLetter()
+    public void DeleteLetter()
     {
-        if (currentIndex > 0)
+        if (inputWord.Length > 0)
         {
-            currentIndex--;
-            letterSlots[currentIndex].text = "";
+            inputWord = inputWord.Substring(0, inputWord.Length - 1);
+            UpdateResultText();
         }
     }
 
     public void ClearInput()
     {
-        for (int i = 0; i < letterSlots.Length; i++)
-        {
-            letterSlots[i].text = "";
-        }
-        currentIndex = 0;
+        inputWord = "";
+        UpdateResultText();
     }
 
-    public void CheckAnswer()
+    public void SubmitWord()
     {
-        string input = "";
-        foreach (TMP_Text letter in letterSlots)
+        if (inputWord == correctAnswer)
         {
-            input += letter.text.ToUpper();
-        }
-
-        if (input == "CARDS")
-        {
-            feedbackText.text = "Correct!";
+            TutorialManager.instance.ShowPraiseThenNext("Good job!");
         }
         else
         {
-            feedbackText.text = "Try again!";
+            TutorialManager.instance.ShowPraiseThenNext("Try again!");
+            ClearInput();
         }
     }
 
-    public void EnableLetterButtons(List<char> letters)
+    public void UpdateResultText()
     {
-        if (letters == null)
-        {
-            Debug.LogWarning("EnableLetterButtons called with null letter list.");
-            return;
-        }
+        resultText.text = inputWord;
+    }
 
-        foreach (Transform button in transform)
-        {
-            Button b = button.GetComponent<Button>();
-            TMP_Text text = b.GetComponentInChildren<TMP_Text>();
+    public void EnableLetterButtons(List<string> letters)
+    {
+        letters = letters.OrderBy(x => Random.value).ToList();
 
-            if (text != null && letters.Contains(text.text[0]))
+        for (int i = 0; i < letterButtons.Count; i++)
+        {
+            if (i < letters.Count)
             {
-                b.interactable = true;
+                string l = letters[i];
+                letterButtons[i].GetComponentInChildren<TMP_Text>().text = l;
+                letterButtons[i].onClick.RemoveAllListeners();
+                letterButtons[i].onClick.AddListener(() => AddLetter(l));
+                letterButtons[i].gameObject.SetActive(true);
             }
             else
             {
-                b.interactable = false;
+                letterButtons[i].gameObject.SetActive(false);
             }
         }
     }
