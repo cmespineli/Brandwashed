@@ -358,6 +358,7 @@
 "Assets/Scripts/GameOnly/GameManager_Game.cs"
 "Assets/Scripts/GameOnly/RiddleManager.cs"
 "Assets/Scripts/GoToNextLevel.cs"
+"Assets/Scripts/LetterButtonHandler.cs"
 "Assets/Scripts/TutorialManager.cs"
 "Assets/Scripts/WordInput.cs"
 "Assets/Scripts/WordInput_Game.cs"

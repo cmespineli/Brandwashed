@@ -10,6 +10,8 @@ public class WordInput : MonoBehaviour
     public TMP_Text[] letterSlots;
     public Button[] letterButtons;
     public GameObject feedbackText;
+    public GameObject letterButtonPrefab;  // assign in Inspector
+    public Transform buttonPanel;   
     private string correctAnswer = "CARDS";
     private List<string> currentInput = new List<string>();
 
@@ -65,22 +67,19 @@ public class WordInput : MonoBehaviour
 
     public void EnableLetterButtons(List<string> letters)
     {
-        List<string> randomized = letters.OrderBy(x => Random.value).ToList();
-
-        for (int i = 0; i < letterButtons.Length; i++)
+        // Clear existing buttons
+        foreach (Transform child in buttonPanel)
         {
-            if (i < randomized.Count)
-            {
-                letterButtons[i].gameObject.SetActive(true);
-                letterButtons[i].GetComponentInChildren<TMP_Text>().text = randomized[i];
-                string letter = randomized[i];
-                letterButtons[i].onClick.RemoveAllListeners();
-                letterButtons[i].onClick.AddListener(() => AddLetter(letter));
-            }
-            else
-            {
-                letterButtons[i].gameObject.SetActive(false);
-            }
+            Destroy(child.gameObject);
+        }
+
+        // Shuffle letters
+        letters = letters.OrderBy(x => Random.value).ToList();
+
+        foreach (string letter in letters)
+        {
+            GameObject newButton = Instantiate(letterButtonPrefab, buttonPanel);
+            newButton.GetComponent<LetterButtonHandler>().SetLetter(letter);
         }
     }
 }
