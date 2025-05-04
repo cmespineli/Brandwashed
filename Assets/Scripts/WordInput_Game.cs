@@ -1,3 +1,4 @@
+// WordInput_Game.cs
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -46,6 +47,7 @@ public class WordInput_Game : MonoBehaviour
         if (attempt.ToUpper() == correctWord)
         {
             feedbackText.text = "✅ Correct!";
+            TimerManager.instance.ResetTimer(); // Reset timer on correct answer
         }
         else
         {
@@ -62,4 +64,4 @@ public class WordInput_Game : MonoBehaviour
         currentIndex = 0;
         feedbackText.text = "";
     }
-}
+} 

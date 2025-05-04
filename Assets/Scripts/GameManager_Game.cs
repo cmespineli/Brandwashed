@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-
 public class GameManager_Game : MonoBehaviour
 {
     public static GameManager_Game instance;
@@ -13,7 +12,9 @@ public class GameManager_Game : MonoBehaviour
     public Transform cardGrid;
     public GameObject letterButtonPrefab;
     public Transform buttonPanel;
-    public RiddleManager riddleManager;
+
+    public RiddleManager riddleManager;         // Set in Inspector
+    public ScoreManager_Game scoreManager;      // Set in Inspector
 
     private Card_Game firstCard, secondCard;
 
@@ -33,7 +34,7 @@ public class GameManager_Game : MonoBehaviour
         {
             firstCard = card;
         }
-        else
+        else if (secondCard == null && card != firstCard)
         {
             secondCard = card;
             StartCoroutine(CheckMatch());
@@ -46,9 +47,36 @@ public class GameManager_Game : MonoBehaviour
 
         if (firstCard.letter == secondCard.letter)
         {
+            // Add score
+            scoreManager?.AddPoints(100);
+
+            // Disable the matched buttons
+            firstCard.button.interactable = false;
+            secondCard.button.interactable = false;
+
+            // Create letter input button
             CreateLetterButton(firstCard.letter);
+
+            // Destroy cards
             Destroy(firstCard.gameObject);
             Destroy(secondCard.gameObject);
+
+            // Wait for the frame to end so Unity removes destroyed objects
+            yield return new WaitForEndOfFrame();
+
+            // Check remaining active cards
+            int activeCards = 0;
+            foreach (Transform child in cardGrid)
+            {
+                if (child.gameObject.activeSelf)
+                    activeCards++;
+            }
+
+            // If all cards are cleared, move to riddle stage
+            if (activeCards <= 0)
+            {
+                riddleManager?.ShowRiddleUI();
+            }
         }
         else
         {
@@ -71,7 +99,7 @@ public class GameManager_Game : MonoBehaviour
     }
 
     public void SetupCards(string word)
-        {
+    {
         List<char> letters = new List<char>(word.ToUpper());
         letters.AddRange(letters); // create pairs
         letters = letters.OrderBy(x => Random.value).ToList(); // shuffle
