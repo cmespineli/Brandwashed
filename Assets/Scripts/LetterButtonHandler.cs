@@ -10,27 +10,47 @@ public class LetterButtonHandler : MonoBehaviour
     {
         letter = newLetter;
 
-        // Update visible letter text
         TMP_Text text = GetComponentInChildren<TMP_Text>();
         if (text != null)
         {
             text.text = letter;
         }
 
-        // Prevent double-adding listeners
         GetComponent<Button>().onClick.RemoveAllListeners();
 
-        // Add listener to pass letter to WordInput_Game
         GetComponent<Button>().onClick.AddListener(() =>
         {
-            if (WordInput_Game.instance != null)
+            // Try tutorial version first
+            if (WordInputExists())
+            {
+                WordInput.instance.AddLetter(letter);
+            }
+            else if (WordInput_GameExists())
             {
                 WordInput_Game.instance.AddLetter(letter);
             }
             else
             {
-                Debug.LogWarning("WordInput_Game.instance is null");
+                Debug.LogWarning("⚠ No WordInput or WordInput_Game instance found.");
             }
         });
+    }
+
+    private bool WordInputExists()
+    {
+#if UNITY_EDITOR
+        return WordInput.instance != null;
+#else
+        return FindObjectOfType<WordInput>() != null;
+#endif
+    }
+
+    private bool WordInput_GameExists()
+    {
+#if UNITY_EDITOR
+        return WordInput_Game.instance != null;
+#else
+        return FindObjectOfType<WordInput_Game>() != null;
+#endif
     }
 }

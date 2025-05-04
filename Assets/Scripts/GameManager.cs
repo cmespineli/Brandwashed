@@ -15,6 +15,10 @@ public class GameManager : MonoBehaviour
     private int matchCount = 0;
     private HashSet<char> matchedLetters = new HashSet<char>();
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip flipSound;
+
     private void Awake()
     {
         instance = this;
@@ -64,6 +68,8 @@ public class GameManager : MonoBehaviour
 
     public void CardRevealed(Card card)
     {
+        PlayFlipSound();
+
         if (firstCard == null)
         {
             firstCard = card;
@@ -81,7 +87,7 @@ public class GameManager : MonoBehaviour
 
         if (firstCard.GetLetter() == secondCard.GetLetter())
         {
-            matchedLetters.Add(firstCard.GetLetter()[0]); // Fix applied here
+            matchedLetters.Add(firstCard.GetLetter()[0]);
             firstCard.SetInteractable(false);
             secondCard.SetInteractable(false);
             matchCount++;
@@ -102,6 +108,14 @@ public class GameManager : MonoBehaviour
         }
 
         firstCard = secondCard = null;
+    }
+
+    void PlayFlipSound()
+    {
+        if (audioSource != null && flipSound != null)
+        {
+            audioSource.PlayOneShot(flipSound);
+        }
     }
 
     public HashSet<char> GetMatchedLetters()

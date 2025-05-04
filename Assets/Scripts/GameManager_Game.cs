@@ -16,11 +16,19 @@ public class GameManager_Game : MonoBehaviour
     public RiddleManager riddleManager;
     public ScoreManager_Game scoreManager;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip flipSound;
+
+    [Header("UI")]
+    public TMP_Text roundText;
+    private int roundNumber = 1;
+
     [Header("Gameplay")]
     private List<Card_Game> allCards = new List<Card_Game>();
     private Card_Game firstCard, secondCard;
     private int matchCount = 0;
-    private bool canClick = true; // 🔒 Prevents triple-click
+    private bool canClick = true;
 
     void Awake()
     {
@@ -29,6 +37,7 @@ public class GameManager_Game : MonoBehaviour
 
     void Start()
     {
+        UpdateRoundUI();
         riddleManager.LoadNewRiddle();
         riddleManager.StartCardPhase();
     }
@@ -37,7 +46,6 @@ public class GameManager_Game : MonoBehaviour
     {
         allCards.Clear();
 
-        // Collect cards from grid children
         foreach (Transform child in cardGrid)
         {
             Card_Game card = child.GetComponent<Card_Game>();
@@ -48,7 +56,6 @@ public class GameManager_Game : MonoBehaviour
             }
         }
 
-        // Shuffle and assign 5 letter pairs
         List<char> letters = new List<char>(word.ToUpper());
         letters.AddRange(letters);
         letters = letters.OrderBy(x => Random.value).ToList();
@@ -72,23 +79,25 @@ public class GameManager_Game : MonoBehaviour
 
     public void CardRevealed(Card_Game card)
     {
-        if (!canClick) return; // ❌ prevent mid-check clicks
+        if (!canClick) return;
 
         if (firstCard == null)
         {
             firstCard = card;
+            PlayFlipSound();
         }
         else if (secondCard == null && card != firstCard)
         {
             secondCard = card;
-            canClick = false; // 🔒 lock further input
+            PlayFlipSound();
+            canClick = false;
             StartCoroutine(CheckMatch());
         }
     }
 
     IEnumerator CheckMatch()
     {
-        yield return new WaitForSeconds(0.3f); // faster check
+        yield return new WaitForSeconds(0.25f);
 
         if (firstCard.letter == secondCard.letter && !string.IsNullOrEmpty(firstCard.letter))
         {
@@ -112,7 +121,7 @@ public class GameManager_Game : MonoBehaviour
 
         firstCard = null;
         secondCard = null;
-        canClick = true; // 🔓 allow new flips
+        canClick = true;
     }
 
     public void CreateLetterButton(string letter)
@@ -137,8 +146,27 @@ public class GameManager_Game : MonoBehaviour
             Destroy(child.gameObject);
         }
 
+        roundNumber++;
+        UpdateRoundUI();
+
         riddleManager.LoadNewRiddle();
         cardGrid.gameObject.SetActive(true);
         riddleManager.StartCardPhase();
+    }
+
+    void UpdateRoundUI()
+    {
+        if (roundText != null)
+        {
+            roundText.text = $"Round: {roundNumber}";
+        }
+    }
+
+    void PlayFlipSound()
+    {
+        if (audioSource != null && flipSound != null)
+        {
+            audioSource.PlayOneShot(flipSound);
+        }
     }
 }
