@@ -4,46 +4,101 @@ using TMPro;
 
 public class Card : MonoBehaviour
 {
-    public string letter;
-    public Button button;
-    public TMP_Text cardText;
-
+    [SerializeField] private TextMeshProUGUI letterText;
+    private Button button;
+    private char storedLetter;
     private bool isRevealed = false;
 
-    void Awake()
+    private void Awake()
     {
-        if (cardText == null)
-            cardText = GetComponentInChildren<TMP_Text>();
+        button = GetComponent<Button>();
 
-        if (button == null)
-            button = GetComponent<Button>();
+        if (letterText == null)
+        {
+            letterText = GetComponentInChildren<TextMeshProUGUI>();
+        }
+
+        if (button != null)
+        {
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(RevealCard);
+        }
+
+        HideLetter();
+    }
+
+    public void AssignLetter(string letter)
+    {
+        if (!string.IsNullOrEmpty(letter) && letter.Length == 1)
+        {
+            storedLetter = letter[0];
+            HideLetter();
+        }
+        else
+        {
+            Debug.LogWarning("Invalid letter passed to AssignLetter: " + letter);
+        }
     }
 
     public void RevealCard()
     {
-        if (isRevealed) return;
-
-        isRevealed = true;
-
-        if (cardText != null)
-            cardText.text = letter;
-
-        // ✅ ONLY call the tutorial manager — not GameManager_Game
-        if (GameManager.instance != null)
+        if (!isRevealed)
         {
+            isRevealed = true;
+            letterText.text = storedLetter.ToString();
             GameManager.instance.CardRevealed(this);
-        }
-        else
-        {
-            Debug.LogWarning("GameManager.instance is null in tutorial scene!");
         }
     }
 
-    public void HideCard()
+    public void ResetCard()
     {
         isRevealed = false;
+        letterText.text = "?";
+    }
 
-        if (cardText != null)
-            cardText.text = "?";
+    public void Lock()
+    {
+        if (button != null)
+        {
+            button.interactable = false;
+        }
+    }
+
+    public void Unlock()
+    {
+        if (button != null)
+        {
+            button.interactable = true;
+        }
+        HideLetter();
+    }
+
+    private void HideLetter()
+    {
+        isRevealed = false;
+        if (letterText != null)
+        {
+            letterText.text = "?";
+        }
+    }
+
+    public char GetLetter()
+    {
+        return storedLetter;
+    }
+
+    public void Hide()
+    {
+        gameObject.SetActive(false);
+    }
+
+    public void Show()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public bool IsLocked()
+    {
+        return !GetComponent<Button>().interactable;
     }
 }

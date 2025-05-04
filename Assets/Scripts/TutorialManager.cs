@@ -1,24 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
 public class TutorialManager : MonoBehaviour
 {
     public TMP_Text tutorialText;
+    public TMP_Text tutorialTextRect;
     public Button nextButton;
     public GameObject cardGrid;
     public GameObject wordInputPanel;
     public GameObject buttonPanel;
+    public GameObject riddleText;
+    public GameObject successIcon;
+    public GameObject inputControlsPanel;
 
     private int step = 0;
 
     private string[] messages = new string[]
     {
-        "Match two cards to reveal a letter!",
-        "Keep matching cards until they're all gone!",
-        "Use the letter buttons to guess the word!"
+        "Welcome to Brandwashed!",
+        "Your objective is to use the cards on the table and match them to help solve the riddle!",
+        "Match two cards of the same letter!",
+        "Now match all the pairs!",
+        "Use the letter buttons to spell the answer!",
+        "Are you ready to try it for real?"
     };
 
     public static TutorialManager instance;
@@ -31,42 +39,92 @@ public class TutorialManager : MonoBehaviour
     public void StartTutorial()
     {
         step = 0;
+
+        cardGrid.SetActive(false);
+        wordInputPanel.SetActive(false);
+        buttonPanel.SetActive(false);
+        riddleText.SetActive(false);
+        inputControlsPanel.SetActive(false);
+        tutorialText.gameObject.SetActive(false);
+        tutorialTextRect.gameObject.SetActive(false);
+
         ShowStep();
     }
 
     public void NextStep()
     {
         step++;
-        nextButton.gameObject.SetActive(false); // hide after advancing
+        nextButton.gameObject.SetActive(false);
 
         if (step < messages.Length)
+        {
             ShowStep();
+        }
         else
-            EndTutorial();
+        {
+            SceneManager.LoadScene("RealGameScene");
+        }
     }
 
     void ShowStep()
     {
-        tutorialText.text = messages[step];
-        nextButton.gameObject.SetActive(false); // always hide initially
+        tutorialText.text = "";
+        tutorialTextRect.text = "";
 
-        if (step == 0)
+        cardGrid.SetActive(false);
+        wordInputPanel.SetActive(false);
+        buttonPanel.SetActive(false);
+        riddleText.SetActive(false);
+        inputControlsPanel.SetActive(false);
+        nextButton.gameObject.SetActive(false);
+        tutorialText.gameObject.SetActive(false);
+        tutorialTextRect.gameObject.SetActive(false);
+
+        if (step == 0 || step == 1)
         {
-            cardGrid.SetActive(true);
-            wordInputPanel.SetActive(false);
-            buttonPanel.SetActive(false);
-        }
-        else if (step == 1)
-        {
-            cardGrid.SetActive(true);
-            wordInputPanel.SetActive(false);
-            buttonPanel.SetActive(false);
+            tutorialTextRect.gameObject.SetActive(true);
+            tutorialTextRect.text = messages[step];
+            nextButton.gameObject.SetActive(true);
         }
         else if (step == 2)
         {
-            cardGrid.SetActive(false);
+            tutorialText.gameObject.SetActive(true);
+            tutorialText.text = messages[step];
+            cardGrid.SetActive(true);
+        }
+        else if (step == 3)
+        {
+            tutorialText.gameObject.SetActive(true);
+            tutorialText.text = messages[step];
+            cardGrid.SetActive(true);
+            GameManager.instance.EnableAllUnlockedCards();
+        }
+        else if (step == 4)
+        {
+            tutorialText.gameObject.SetActive(true);
+            tutorialText.text = messages[step];
             wordInputPanel.SetActive(true);
             buttonPanel.SetActive(true);
+            riddleText.SetActive(true);
+            inputControlsPanel.SetActive(true);
+
+            riddleText.GetComponent<TMP_Text>().text =
+                "I come in pairs but never walk, I spell solutions but never talk. What am I?";
+
+            if (WordInput.instance != null)
+            {
+                WordInput.instance.EnableLetterButtons(GameManager.instance.matchedLetters);
+            }
+            else
+            {
+                Debug.LogWarning("WordInput.instance was null at Step 4.");
+            }
+        }
+        else if (step == 5)
+        {
+            tutorialTextRect.gameObject.SetActive(true);
+            tutorialTextRect.text = messages[step];
+            nextButton.gameObject.SetActive(true);
         }
     }
 
@@ -75,19 +133,25 @@ public class TutorialManager : MonoBehaviour
         nextButton.gameObject.SetActive(true);
     }
 
+    public void ShowGoodJobThenNext(string message)
+    {
+        StartCoroutine(ShowPraiseThenNext(message));
+    }
+
+    IEnumerator ShowPraiseThenNext(string message)
+    {
+        tutorialText.text = message;
+        yield return new WaitForSeconds(1.2f);
+        ShowNextButton();
+    }
+
+    public bool CurrentStepIs(int i)
+    {
+        return step == i;
+    }
+
     public int GetCurrentStep()
     {
         return step;
-    }
-
-    public bool CurrentStepIs(int index)
-    {
-        return step == index;
-    }
-
-    void EndTutorial()
-    {
-        tutorialText.text = "";
-        nextButton.gameObject.SetActive(false);
     }
 }

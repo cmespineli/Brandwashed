@@ -1,66 +1,88 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class WordInput : MonoBehaviour
 {
     public static WordInput instance;
 
-    public List<TMP_Text> inputSlots;   // Drag in your 5 TMP text boxes here
+    public TMP_Text[] letterSlots;
+    public TMP_Text feedbackText;
+
     private int currentIndex = 0;
 
-    public string correctWord;          // Set this in the Inspector (e.g., "APPLE")
-    public TMP_Text feedback;           // Feedback box for messages
-
-    void Awake()
+    void OnEnable()
     {
         instance = this;
     }
 
     public void AddLetter(string letter)
     {
-        if (currentIndex >= inputSlots.Count) return;
-
-        inputSlots[currentIndex].text = letter;
-        currentIndex++;
-
-        if (currentIndex == inputSlots.Count)
+        if (currentIndex < letterSlots.Length)
         {
-            CheckAnswer();
+            letterSlots[currentIndex].text = letter;
+            currentIndex++;
         }
     }
 
-    void CheckAnswer()
+    public void DeleteLastLetter()
     {
-        string attempt = "";
-        foreach (TMP_Text t in inputSlots)
+        if (currentIndex > 0)
         {
-            attempt += t.text;
+            currentIndex--;
+            letterSlots[currentIndex].text = "";
+        }
+    }
+
+    public void ClearInput()
+    {
+        for (int i = 0; i < letterSlots.Length; i++)
+        {
+            letterSlots[i].text = "";
+        }
+        currentIndex = 0;
+    }
+
+    public void CheckAnswer()
+    {
+        string input = "";
+        foreach (TMP_Text letter in letterSlots)
+        {
+            input += letter.text.ToUpper();
         }
 
-        if (attempt.ToUpper() == correctWord.ToUpper())
+        if (input == "CARDS")
         {
-            feedback.text = "✅ Correct!";
+            feedbackText.text = "Correct!";
         }
         else
         {
-            feedback.text = "❌ Try Again!";
+            feedbackText.text = "Try again!";
         }
     }
 
-    public void ResetInput()
+    public void EnableLetterButtons(List<char> letters)
     {
-        foreach (TMP_Text t in inputSlots)
+        if (letters == null)
         {
-            t.text = "";
+            Debug.LogWarning("EnableLetterButtons called with null letter list.");
+            return;
         }
-        currentIndex = 0;
-        feedback.text = "";
-    }
-    public void SetCorrectWord(string word)
-    {
-        correctWord = word.ToUpper();
-        ResetInput();
-    }
 
+        foreach (Transform button in transform)
+        {
+            Button b = button.GetComponent<Button>();
+            TMP_Text text = b.GetComponentInChildren<TMP_Text>();
+
+            if (text != null && letters.Contains(text.text[0]))
+            {
+                b.interactable = true;
+            }
+            else
+            {
+                b.interactable = false;
+            }
+        }
+    }
 }
