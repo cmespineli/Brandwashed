@@ -7,72 +7,75 @@ using System.Linq;
 public class WordInput : MonoBehaviour
 {
     public static WordInput instance;
-
-    public List<Button> letterButtons;
-    public TMP_Text resultText;
-    private string inputWord = "";
+    public TMP_Text[] letterSlots;
+    public Button[] letterButtons;
+    public GameObject feedbackText;
     private string correctAnswer = "CARDS";
+    private List<string> currentInput = new List<string>();
 
-    void Awake()
+    private void Awake()
     {
         instance = this;
     }
 
     public void AddLetter(string letter)
     {
-        if (inputWord.Length < 5)
+        if (currentInput.Count < letterSlots.Length)
         {
-            inputWord += letter;
-            UpdateResultText();
+            currentInput.Add(letter);
+            UpdateLetterSlots();
         }
     }
 
-    public void DeleteLetter()
+    public void DeleteLastLetter()
     {
-        if (inputWord.Length > 0)
+        if (currentInput.Count > 0)
         {
-            inputWord = inputWord.Substring(0, inputWord.Length - 1);
-            UpdateResultText();
+            currentInput.RemoveAt(currentInput.Count - 1);
+            UpdateLetterSlots();
         }
     }
 
     public void ClearInput()
     {
-        inputWord = "";
-        UpdateResultText();
+        currentInput.Clear();
+        UpdateLetterSlots();
     }
 
-    public void SubmitWord()
+    void UpdateLetterSlots()
     {
-        if (inputWord == correctAnswer)
+        for (int i = 0; i < letterSlots.Length; i++)
         {
-            TutorialManager.instance.ShowPraiseThenNext("Good job!");
+            letterSlots[i].text = i < currentInput.Count ? currentInput[i] : "";
+        }
+    }
+
+    public void SubmitAnswer()
+    {
+        string attempt = string.Join("", currentInput);
+        if (attempt == correctAnswer)
+        {
+            TutorialManager.instance.ShowGoodJobThenNext("Good job!");
         }
         else
         {
-            TutorialManager.instance.ShowPraiseThenNext("Try again!");
-            ClearInput();
+            TutorialManager.instance.ShowGoodJobThenNext("Try again!");
         }
-    }
-
-    public void UpdateResultText()
-    {
-        resultText.text = inputWord;
     }
 
     public void EnableLetterButtons(List<string> letters)
     {
-        letters = letters.OrderBy(x => Random.value).ToList();
+        List<string> randomized = letters.OrderBy(x => Random.value).ToList();
 
-        for (int i = 0; i < letterButtons.Count; i++)
+        for (int i = 0; i < letterButtons.Length; i++)
         {
-            if (i < letters.Count)
+            if (i < randomized.Count)
             {
-                string l = letters[i];
-                letterButtons[i].GetComponentInChildren<TMP_Text>().text = l;
-                letterButtons[i].onClick.RemoveAllListeners();
-                letterButtons[i].onClick.AddListener(() => AddLetter(l));
                 letterButtons[i].gameObject.SetActive(true);
+                letterButtons[i].GetComponentInChildren<TMP_Text>().text = randomized[i];
+                string letter = randomized[i];
+                letterButtons[i].onClick.RemoveAllListeners();
+                letterButtons[i].onClick.AddListener(() => AddLetter(letter));
             }
             else
             {

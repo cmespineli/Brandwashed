@@ -1,104 +1,111 @@
-// =====================
-// GameManager.cs
-// =====================
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    public RectTransform cardGrid;
+    public Transform cardGrid;
     private List<Card> allCards = new List<Card>();
-    private List<Card> revealedCards = new List<Card>();
 
-    private char[] letterPool = { 'C', 'A', 'R', 'D', 'S', 'C', 'A', 'R', 'D', 'S' };
+    private Card firstCard, secondCard;
+    private int matchCount = 0;
     private HashSet<char> matchedLetters = new HashSet<char>();
 
-    void Awake()
+    private void Awake()
     {
         instance = this;
+    }
+
+    void Start()
+    {
         InitializeCards();
     }
 
     void InitializeCards()
     {
-        allCards = cardGrid.GetComponentsInChildren<Card>().ToList();
-        var shuffled = letterPool.OrderBy(x => Random.value).ToArray();
+        allCards.Clear();
+
+        foreach (Transform child in cardGrid)
+        {
+            Card card = child.GetComponent<Card>();
+            if (card != null)
+            {
+                allCards.Add(card);
+                card.HideLetter();
+                card.SetInteractable(false);
+            }
+        }
+
+        List<char> letters = new List<char>("CARDSCARDS");
+        System.Random rng = new System.Random();
+        letters = letters.OrderBy(_ => rng.Next()).ToList();
 
         for (int i = 0; i < allCards.Count; i++)
         {
-            allCards[i].SetLetter(shuffled[i]);
-            allCards[i].SetInteractable(false);
+            allCards[i].AssignLetter(letters[i].ToString());
         }
     }
 
-    public void EnableAllUnlockedCards()
+    public void StartStep3Matching()
     {
+        matchCount = 0;
+        firstCard = secondCard = null;
+
         foreach (Card card in allCards)
         {
+            card.HideLetter();
             card.SetInteractable(true);
         }
     }
 
-    public void OnCardRevealed(Card card)
+    public void CardRevealed(Card card)
     {
-        if (revealedCards.Contains(card)) return;
-
-        revealedCards.Add(card);
-
-        if (revealedCards.Count == 2)
-            StartCoroutine(CheckMatch());
+        if (firstCard == null)
+        {
+            firstCard = card;
+        }
+        else if (secondCard == null && card != firstCard)
+        {
+            secondCard = card;
+            StartCoroutine(EvaluateMatch());
+        }
     }
 
-    IEnumerator CheckMatch()
+    IEnumerator EvaluateMatch()
     {
         yield return new WaitForSeconds(0.5f);
 
-        Card card1 = revealedCards[0];
-        Card card2 = revealedCards[1];
-
-        if (card1.GetLetter() == card2.GetLetter())
+        if (firstCard.GetLetter() == secondCard.GetLetter())
         {
-            card1.Lock();
-            card2.Lock();
-            matchedLetters.Add(card1.GetLetter());
+            matchedLetters.Add(firstCard.GetLetter()[0]); // Fix applied here
+            firstCard.SetInteractable(false);
+            secondCard.SetInteractable(false);
+            matchCount++;
 
             if (TutorialManager.instance.CurrentStepIs(2))
             {
-                foreach (Card card in allCards)
-                {
-                    if (!card.IsLocked()) card.SetInteractable(false);
-                }
-                TutorialManager.instance.ShowPraiseThenNext("Good job!");
+                TutorialManager.instance.ShowGoodJobThenNext("Good job!");
             }
-            else if (TutorialManager.instance.CurrentStepIs(3))
+            else if (TutorialManager.instance.CurrentStepIs(3) && matchCount >= 5)
             {
-                bool allMatched = allCards.All(c => c.IsLocked());
-                if (allMatched)
-                {
-                    TutorialManager.instance.ShowPraiseThenNext("Great work!");
-                }
+                TutorialManager.instance.ShowGoodJobThenNext("Great job!");
             }
         }
         else
         {
-            card1.HideLetter();
-            card2.HideLetter();
+            firstCard.HideLetter();
+            secondCard.HideLetter();
         }
 
-        revealedCards.Clear();
-
-        if (matchedLetters.Count >= 5 && TutorialManager.instance.CurrentStepIs(3))
-        {
-            TutorialManager.instance.AdvanceToRiddleStage(matchedLetters.Select(c => c.ToString()).ToList());
-        }
+        firstCard = secondCard = null;
     }
 
-    public List<char> GetMatchedLetters()
+    public HashSet<char> GetMatchedLetters()
     {
-        return matchedLetters.ToList();
+        return matchedLetters;
     }
 }

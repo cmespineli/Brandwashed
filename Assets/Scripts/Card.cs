@@ -6,83 +6,65 @@ public class Card : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI letterText;
     private Button button;
-    private char storedLetter;
+    private string storedLetter;
     private bool isRevealed = false;
-    private bool isLocked = false;
 
     private void Awake()
     {
         button = GetComponent<Button>();
-        if (button != null)
-        {
-            button.onClick.AddListener(RevealCard);
-        }
-        else
-        {
-            Debug.LogWarning("Button not found on card: " + gameObject.name);
-        }
 
         if (letterText == null)
         {
             letterText = GetComponentInChildren<TextMeshProUGUI>();
-            if (letterText == null)
-            {
-                Debug.LogWarning("TextMeshProUGUI not found on card: " + gameObject.name);
-            }
+        }
+
+        if (button != null)
+        {
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(RevealCard);
         }
 
         HideLetter();
     }
 
-    public void SetLetter(char letter)
+    public void AssignLetter(string letter)
     {
-        storedLetter = letter;
-        HideLetter(); // Start with hidden state
+        if (!string.IsNullOrEmpty(letter) && letter.Length == 1)
+        {
+            storedLetter = letter;
+            HideLetter();
+        }
+        else
+        {
+            Debug.LogWarning("Invalid letter assigned: " + letter);
+        }
     }
 
     public void RevealCard()
     {
-        if (isLocked || isRevealed) return;
+        if (isRevealed) return;
 
         isRevealed = true;
-        ShowLetter();
-        GameManager.instance.OnCardRevealed(this);
+        letterText.text = storedLetter;
+        GameManager.instance.CardRevealed(this);
     }
 
     public void HideLetter()
     {
         isRevealed = false;
-        if (letterText != null)
-            letterText.text = "?";
+        letterText.text = "?";
     }
 
-    public void ShowLetter()
-    {
-        if (letterText != null)
-            letterText.text = storedLetter.ToString();
-    }
-
-    public void Lock()
-    {
-        isLocked = true;
-        SetInteractable(false);
-    }
-
-    public void SetInteractable(bool state)
+    public void SetInteractable(bool interactable)
     {
         if (button != null)
-            button.interactable = state;
+        {
+            button.interactable = interactable;
+        }
     }
 
-    public bool IsLocked() => isLocked;
-    public char GetLetter() => storedLetter;
-    public bool IsRevealed() => isRevealed;
-
-    public void ResetCard()
+    public string GetLetter()
     {
-        isRevealed = false;
-        isLocked = false;
-        HideLetter();
-        SetInteractable(true);
+        return storedLetter;
     }
 }
