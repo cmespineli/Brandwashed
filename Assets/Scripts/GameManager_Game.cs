@@ -9,14 +9,17 @@ public class GameManager_Game : MonoBehaviour
 {
     public static GameManager_Game instance;
 
+    [Header("References")]
     public Transform cardGrid;
     public GameObject letterButtonPrefab;
     public Transform buttonPanel;
+    public RiddleManager riddleManager;
+    public ScoreManager_Game scoreManager;
 
-    public RiddleManager riddleManager;         // Set in Inspector
-    public ScoreManager_Game scoreManager;      // Set in Inspector
-
+    [Header("Gameplay")]
+    private List<Card_Game> allCards = new List<Card_Game>();
     private Card_Game firstCard, secondCard;
+    private int matchCount = 0;
 
     void Awake()
     {
@@ -26,6 +29,34 @@ public class GameManager_Game : MonoBehaviour
     void Start()
     {
         riddleManager.LoadNewRiddle();
+    }
+
+    public void SetupCards(string word)
+    {
+        allCards.Clear();
+
+        // Get all cards from grid
+        foreach (Transform child in cardGrid)
+        {
+            Card_Game card = child.GetComponent<Card_Game>();
+            if (card != null)
+            {
+                allCards.Add(card);
+            }
+        }
+
+        // Create letter pairs and shuffle
+        List<char> letters = new List<char>(word.ToUpper());
+        letters.AddRange(letters);
+        letters = letters.OrderBy(x => Random.value).ToList();
+
+        for (int i = 0; i < allCards.Count; i++)
+        {
+            allCards[i].AssignLetter(letters[i].ToString());
+            allCards[i].HideCard();
+        }
+
+        matchCount = 0;
     }
 
     public void CardRevealed(Card_Game card)
@@ -43,39 +74,20 @@ public class GameManager_Game : MonoBehaviour
 
     IEnumerator CheckMatch()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
 
-        if (firstCard.letter == secondCard.letter)
+        if (firstCard.letter == secondCard.letter && !string.IsNullOrEmpty(firstCard.letter))
         {
-            // Add score
-            scoreManager?.AddPoints(100);
-
-            // Disable the matched buttons
-            firstCard.button.interactable = false;
-            secondCard.button.interactable = false;
-
-            // Create letter input button
+            scoreManager.AddPoints(100);
             CreateLetterButton(firstCard.letter);
-
-            // Destroy cards
             Destroy(firstCard.gameObject);
             Destroy(secondCard.gameObject);
+            matchCount++;
 
-            // Wait for the frame to end so Unity removes destroyed objects
-            yield return new WaitForEndOfFrame();
-
-            // Check remaining active cards
-            int activeCards = 0;
-            foreach (Transform child in cardGrid)
+            if (matchCount >= 5)
             {
-                if (child.gameObject.activeSelf)
-                    activeCards++;
-            }
-
-            // If all cards are cleared, move to riddle stage
-            if (activeCards <= 0)
-            {
-                riddleManager?.ShowRiddleUI();
+                yield return new WaitForSeconds(0.5f);
+                riddleManager.ShowRiddleUI();
             }
         }
         else
@@ -91,24 +103,16 @@ public class GameManager_Game : MonoBehaviour
     public void CreateLetterButton(string letter)
     {
         GameObject newButton = Instantiate(letterButtonPrefab, buttonPanel);
-        TMP_Text textComponent = newButton.GetComponentInChildren<TMP_Text>();
-        textComponent.text = letter;
 
-        Button button = newButton.GetComponent<Button>();
-        button.onClick.AddListener(() => WordInput_Game.instance.AddLetter(letter));
-    }
-
-    public void SetupCards(string word)
-    {
-        List<char> letters = new List<char>(word.ToUpper());
-        letters.AddRange(letters); // create pairs
-        letters = letters.OrderBy(x => Random.value).ToList(); // shuffle
-
-        for (int i = 0; i < cardGrid.childCount; i++)
+        // Assign the letter and setup the button
+        LetterButtonHandler handler = newButton.GetComponent<LetterButtonHandler>();
+        if (handler != null)
         {
-            Card_Game card = cardGrid.GetChild(i).GetComponent<Card_Game>();
-            card.letter = letters[i].ToString();
-            card.HideCard(); // reset display
+            handler.SetLetter(letter);
+        }
+        else
+        {
+            Debug.LogWarning("LetterButton prefab is missing LetterButtonHandler!");
         }
     }
 }

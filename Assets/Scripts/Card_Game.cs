@@ -1,3 +1,4 @@
+// Card_Game.cs
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -16,16 +17,24 @@ public class Card_Game : MonoBehaviour
             cardText = GetComponentInChildren<TMP_Text>();
         if (button == null)
             button = GetComponent<Button>();
+
+        button.onClick.AddListener(RevealCard);
+    }
+
+    public void AssignLetter(string assignedLetter)
+    {
+        letter = assignedLetter;
+        HideCard();
     }
 
     public void RevealCard()
     {
-        if (isRevealed) return;
+        if (isRevealed || string.IsNullOrEmpty(letter)) return;
 
         isRevealed = true;
         cardText.text = letter;
 
-        GameManager_Game.instance.CardRevealed(this); // game-only manager
+        GameManager_Game.instance.CardRevealed(this);
     }
 
     public void HideCard()

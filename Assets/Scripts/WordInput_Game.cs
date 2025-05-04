@@ -1,4 +1,3 @@
-// WordInput_Game.cs
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -7,8 +6,12 @@ public class WordInput_Game : MonoBehaviour
 {
     public static WordInput_Game instance;
 
+    [Header("Input UI")]
     public List<TMP_Text> inputSlots;
     public TMP_Text feedbackText;
+    public GameObject inputControlsPanel;
+
+    [Header("Word Logic")]
     public string correctWord;
     private int currentIndex = 0;
 
@@ -25,9 +28,20 @@ public class WordInput_Game : MonoBehaviour
 
     public void AddLetter(string letter)
     {
-        if (currentIndex >= inputSlots.Count) return;
+        // Safety checks
+        if (currentIndex >= inputSlots.Count)
+        {
+            Debug.LogWarning("Attempted to add letter beyond slot count.");
+            return;
+        }
 
-        inputSlots[currentIndex].text = letter;
+        if (inputSlots[currentIndex] == null)
+        {
+            Debug.LogError("Input slot " + currentIndex + " is null!");
+            return;
+        }
+
+        inputSlots[currentIndex].text = letter.Trim();  // Trim in case there's a space
         currentIndex++;
 
         if (currentIndex == inputSlots.Count)
@@ -47,7 +61,7 @@ public class WordInput_Game : MonoBehaviour
         if (attempt.ToUpper() == correctWord)
         {
             feedbackText.text = "✅ Correct!";
-            TimerManager.instance.ResetTimer(); // Reset timer on correct answer
+            TimerManager.instance.ResetTimer(); // Reset timer on correct word
         }
         else
         {
@@ -59,9 +73,29 @@ public class WordInput_Game : MonoBehaviour
     {
         foreach (TMP_Text t in inputSlots)
         {
-            t.text = "";
+            if (t != null)
+                t.text = "";
         }
         currentIndex = 0;
         feedbackText.text = "";
     }
-} 
+
+    public void DeleteLetter()
+    {
+        if (currentIndex > 0)
+        {
+            currentIndex--;
+            inputSlots[currentIndex].text = "";
+        }
+    }
+
+    public void ClearAll()
+    {
+        ResetInput();
+    }
+
+    public void SubmitWord()
+    {
+        CheckAnswer();
+    }
+}

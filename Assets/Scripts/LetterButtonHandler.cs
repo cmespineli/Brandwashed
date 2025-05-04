@@ -1,26 +1,36 @@
 using UnityEngine;
-using TMPro;
 using UnityEngine.UI;
+using TMPro;
 
 public class LetterButtonHandler : MonoBehaviour
 {
-    public string assignedLetter;
-    private Button button;
+    private string letter;
 
-    void Awake()
+    public void SetLetter(string newLetter)
     {
-        button = GetComponent<Button>();
-        button.onClick.AddListener(OnClick);
-    }
+        letter = newLetter;
 
-    public void SetLetter(string letter)
-    {
-        assignedLetter = letter;
-        GetComponentInChildren<TMP_Text>().text = letter;
-    }
+        // Update visible letter text
+        TMP_Text text = GetComponentInChildren<TMP_Text>();
+        if (text != null)
+        {
+            text.text = letter;
+        }
 
-    void OnClick()
-    {
-        WordInput.instance.AddLetter(assignedLetter);
+        // Prevent double-adding listeners
+        GetComponent<Button>().onClick.RemoveAllListeners();
+
+        // Add listener to pass letter to WordInput_Game
+        GetComponent<Button>().onClick.AddListener(() =>
+        {
+            if (WordInput_Game.instance != null)
+            {
+                WordInput_Game.instance.AddLetter(letter);
+            }
+            else
+            {
+                Debug.LogWarning("WordInput_Game.instance is null");
+            }
+        });
     }
 }

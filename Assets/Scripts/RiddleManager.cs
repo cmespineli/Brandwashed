@@ -1,3 +1,4 @@
+// RiddleManager.cs
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -11,8 +12,6 @@ public class RiddleEntry
 
 public class RiddleManager : MonoBehaviour
 {
-    public static RiddleManager instance;
-
     public List<RiddleEntry> riddleBank = new List<RiddleEntry>();
     public TMP_Text riddleText;
     public WordInput_Game wordInput;
@@ -20,7 +19,6 @@ public class RiddleManager : MonoBehaviour
 
     void Awake()
     {
-        instance = this;
         InitializeRiddles();
     }
 
@@ -42,33 +40,28 @@ public class RiddleManager : MonoBehaviour
 
     public void ShowRiddleUI()
     {
-        // Optional: disable card grid
-        if (gameManager.cardGrid != null)
-            gameManager.cardGrid.gameObject.SetActive(false);
-
-        // Show riddle UI and letter input panel
-        if (riddleText != null)
-            riddleText.gameObject.SetActive(true);
-        if (wordInput != null)
-            wordInput.gameObject.SetActive(true);
-        if (gameManager.buttonPanel != null)
-            gameManager.buttonPanel.gameObject.SetActive(true);
+        gameManager.cardGrid.gameObject.SetActive(false);
+        riddleText.gameObject.SetActive(true);
+        wordInput.gameObject.SetActive(true);
+        gameManager.buttonPanel.gameObject.SetActive(true);
+        wordInput.inputControlsPanel.SetActive(true); // <== THIS IS CRUCIAL
     }
 
-    private void InitializeRiddles()
+
+    void InitializeRiddles()
     {
         riddleBank = new List<RiddleEntry>
         {
-            new RiddleEntry { riddle = "I fall from the sky, block the sun, and sting the eyes. What am I?", answer = "ASHES" },
-            new RiddleEntry { riddle = "Born in war, I glow at night, deadly in silence, a toxic fright.", answer = "GLOOM" },
-            new RiddleEntry { riddle = "I'm hoarded, scarce, and make men kill. I'm liquid life, yet never still.", answer = "WATER" },
-            new RiddleEntry { riddle = "I shelter few in times of need. My vaults hold fear, not noble deed.", answer = "BUNKR" },
-            new RiddleEntry { riddle = "You breathe me in, you cough me out. I’m not your friend, without a doubt.", answer = "SMOGS" },
-            new RiddleEntry { riddle = "No longer green, I used to grow. Now I’m cracked and dry below.", answer = "EARTH" },
-            new RiddleEntry { riddle = "I ride the wind, I spread the flame. In silent nights, I end the game.", answer = "FIRES" },
-            new RiddleEntry { riddle = "Once a helper, now I hunt. I have no soul, just metal grunt.", answer = "DRONE" },
-            new RiddleEntry { riddle = "I used to beep, now I scream. I light the dark in every dream.", answer = "SIREN" },
-            new RiddleEntry { riddle = "I feed on waste, I skitter and squeak. I outlast you though I am weak.", answer = "RATTS" }
+            new RiddleEntry { riddle = "Scattered and torn, I'm what's left behind when cities burn.", answer = "ASHEN" },
+            new RiddleEntry { riddle = "I light up nights in cities lost, remnants of a powered cost.", answer = "LIGHT" },
+            new RiddleEntry { riddle = "I crawl through ruins, seeking sound, where no human should be found.", answer = "SNIPE" },
+            new RiddleEntry { riddle = "I'm counted in breaths behind a mask, to survive is my only task.", answer = "VITAL" },
+            new RiddleEntry { riddle = "No green remains, I fall like dust, I once was shelter, now just rust.", answer = "METAL" },
+            new RiddleEntry { riddle = "Hollow eyes behind a screen, I move but never dream.", answer = "ALONE" },
+            new RiddleEntry { riddle = "The signal fades, my voice is gone, but in the dark, I carry on.", answer = "SOUND" },
+            new RiddleEntry { riddle = "Echoes of life in concrete halls, I haunt these man-made walls.", answer = "GHOST" },
+            new RiddleEntry { riddle = "Shattered glass beneath my feet, no more signs, no more street.", answer = "GLASS" },
+            new RiddleEntry { riddle = "I shine without warmth in a sky of ash, memories of a brighter flash.", answer = "SOLAR" }
         };
     }
 }
