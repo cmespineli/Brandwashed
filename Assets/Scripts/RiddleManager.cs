@@ -1,4 +1,3 @@
-// RiddleManager.cs
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -7,7 +6,7 @@ using TMPro;
 public class RiddleEntry
 {
     public string riddle;
-    public string answer; // Must be 5 letters
+    public string answer;
 }
 
 public class RiddleManager : MonoBehaviour
@@ -16,6 +15,8 @@ public class RiddleManager : MonoBehaviour
     public TMP_Text riddleText;
     public WordInput_Game wordInput;
     public GameManager_Game gameManager;
+
+    private RiddleEntry currentRiddle;
 
     void Awake()
     {
@@ -31,22 +32,30 @@ public class RiddleManager : MonoBehaviour
         }
 
         int index = Random.Range(0, riddleBank.Count);
-        RiddleEntry entry = riddleBank[index];
+        currentRiddle = riddleBank[index];
+    }
 
-        riddleText.text = entry.riddle;
-        wordInput.SetCorrectWord(entry.answer);
-        gameManager.SetupCards(entry.answer);
+    public void StartCardPhase()
+    {
+        if (currentRiddle == null)
+        {
+            LoadNewRiddle();
+        }
+
+        gameManager.SetupCards(currentRiddle.answer);
     }
 
     public void ShowRiddleUI()
     {
+        riddleText.text = currentRiddle.riddle;
+        wordInput.SetCorrectWord(currentRiddle.answer);
+
         gameManager.cardGrid.gameObject.SetActive(false);
         riddleText.gameObject.SetActive(true);
         wordInput.gameObject.SetActive(true);
         gameManager.buttonPanel.gameObject.SetActive(true);
-        wordInput.inputControlsPanel.SetActive(true); // <== THIS IS CRUCIAL
+        wordInput.inputControlsPanel.SetActive(true);
     }
-
 
     void InitializeRiddles()
     {

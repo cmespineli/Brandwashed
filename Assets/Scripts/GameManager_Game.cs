@@ -29,31 +29,42 @@ public class GameManager_Game : MonoBehaviour
     void Start()
     {
         riddleManager.LoadNewRiddle();
+        riddleManager.StartCardPhase();
     }
 
     public void SetupCards(string word)
     {
         allCards.Clear();
 
-        // Get all cards from grid
+        // Collect cards from grid children
         foreach (Transform child in cardGrid)
         {
             Card_Game card = child.GetComponent<Card_Game>();
             if (card != null)
             {
+                card.gameObject.SetActive(true); // Ensure reactivated
                 allCards.Add(card);
             }
         }
 
-        // Create letter pairs and shuffle
+        // Shuffle and assign 5 letter pairs to the cards
         List<char> letters = new List<char>(word.ToUpper());
-        letters.AddRange(letters);
-        letters = letters.OrderBy(x => Random.value).ToList();
+        letters.AddRange(letters); // create pairs
+        letters = letters.OrderBy(x => Random.value).ToList(); // shuffle
 
         for (int i = 0; i < allCards.Count; i++)
         {
-            allCards[i].AssignLetter(letters[i].ToString());
-            allCards[i].HideCard();
+            if (i < letters.Count)
+            {
+                allCards[i].AssignLetter(letters[i].ToString());
+                allCards[i].HideCard();
+                allCards[i].gameObject.SetActive(true);
+            }
+            else
+            {
+                // Hide extra cards if you have more than 10 in the grid
+                allCards[i].gameObject.SetActive(false);
+            }
         }
 
         matchCount = 0;
@@ -80,8 +91,8 @@ public class GameManager_Game : MonoBehaviour
         {
             scoreManager.AddPoints(100);
             CreateLetterButton(firstCard.letter);
-            Destroy(firstCard.gameObject);
-            Destroy(secondCard.gameObject);
+            firstCard.gameObject.SetActive(false);
+            secondCard.gameObject.SetActive(false);
             matchCount++;
 
             if (matchCount >= 5)
@@ -104,7 +115,6 @@ public class GameManager_Game : MonoBehaviour
     {
         GameObject newButton = Instantiate(letterButtonPrefab, buttonPanel);
 
-        // Assign the letter and setup the button
         LetterButtonHandler handler = newButton.GetComponent<LetterButtonHandler>();
         if (handler != null)
         {
@@ -114,5 +124,17 @@ public class GameManager_Game : MonoBehaviour
         {
             Debug.LogWarning("LetterButton prefab is missing LetterButtonHandler!");
         }
+    }
+
+    public void StartNextRound()
+    {
+        foreach (Transform child in buttonPanel)
+        {
+            Destroy(child.gameObject);
+        }
+
+        riddleManager.LoadNewRiddle();
+        cardGrid.gameObject.SetActive(true);
+        riddleManager.StartCardPhase();
     }
 }

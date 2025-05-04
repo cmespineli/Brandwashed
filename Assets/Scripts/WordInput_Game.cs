@@ -28,7 +28,6 @@ public class WordInput_Game : MonoBehaviour
 
     public void AddLetter(string letter)
     {
-        // Safety checks
         if (currentIndex >= inputSlots.Count)
         {
             Debug.LogWarning("Attempted to add letter beyond slot count.");
@@ -41,7 +40,7 @@ public class WordInput_Game : MonoBehaviour
             return;
         }
 
-        inputSlots[currentIndex].text = letter.Trim();  // Trim in case there's a space
+        inputSlots[currentIndex].text = letter.Trim();
         currentIndex++;
 
         if (currentIndex == inputSlots.Count)
@@ -61,11 +60,24 @@ public class WordInput_Game : MonoBehaviour
         if (attempt.ToUpper() == correctWord)
         {
             feedbackText.text = "✅ Correct!";
-            TimerManager.instance.ResetTimer(); // Reset timer on correct word
+            TimerManager.instance.ResetTimer();
+
+            // Hide riddle-related UI
+            gameObject.SetActive(false); // WordInput_Game
+            GameManager_Game.instance.buttonPanel.gameObject.SetActive(false);
+            GameManager_Game.instance.riddleManager.riddleText.gameObject.SetActive(false); // Hide riddle text
+            inputControlsPanel.SetActive(false);
+
+            // Show cards again
+            GameManager_Game.instance.cardGrid.gameObject.SetActive(true);
+
+            // Start next round
+            GameManager_Game.instance.StartNextRound();
         }
         else
         {
             feedbackText.text = "❌ Try Again!";
+            HPManager_Game.instance.TakeDamage();
         }
     }
 
