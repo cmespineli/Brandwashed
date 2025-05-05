@@ -29,16 +29,16 @@ public class PauseManager : MonoBehaviour
         isPaused = false;
     }
 
-    public void RestartGame()
-    {
-        Time.timeScale = 1f; // reset time scale
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-
     public void ExitToMainMenu()
     {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("01TitleScreen"); // or whatever your main menu scene is
+        Time.timeScale = 1f; // unpause before leaving
+        UnityEngine.SceneManagement.SceneManager.LoadScene("01TitleScreen");
+    }
+
+    public void RestartGame()
+    {
+        Time.timeScale = 1f; // also unpause here
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
 
     public void QuitGame()
@@ -47,3 +47,4 @@ public class PauseManager : MonoBehaviour
         Application.Quit();
     }
 }
+

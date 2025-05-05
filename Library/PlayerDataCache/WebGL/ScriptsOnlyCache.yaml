@@ -97,14 +97,17 @@ ScriptsOnlyBuild:
     fullTypeName: GoToNextLevel
     methodName: SceneTransition
   - assembly: Assembly-CSharp
-    fullTypeName: GoToNextLevel
-    methodName: SceneTransition
+    fullTypeName: PauseManager
+    methodName: ExitToMainMenu
   - assembly: Assembly-CSharp
     fullTypeName: PauseManager
     methodName: RestartGame
   - assembly: Assembly-CSharp
     fullTypeName: PauseManager
     methodName: ResumeGame
+  - assembly: Assembly-CSharp
+    fullTypeName: ButtonClickSound
+    methodName: PlayClickSound
   - assembly: Assembly-CSharp
     fullTypeName: Card_Game
     methodName: RevealCard
@@ -156,9 +159,6 @@ ScriptsOnlyBuild:
   - assembly: Assembly-CSharp
     fullTypeName: Card_Game
     methodName: RevealCard
-  - assembly: Assembly-CSharp
-    fullTypeName: ButtonClickSound
-    methodName: PlayClickSound
   - assembly: Assembly-CSharp
     fullTypeName: GoToNextLevel
     methodName: SceneTransition
@@ -1670,4 +1670,4 @@ ScriptsOnlyBuild:
   - Assets/Scenes/03GameScene.unity
   - Assets/Scenes/08PauseMenu.unity
   - Assets/Scenes/02Tutorial.unity
-  playerPath: C:/Users/craig/OneDrive/Desktop/Brandwashed
+  playerPath: C:/Users/craig/OneDrive/Desktop/bwitch

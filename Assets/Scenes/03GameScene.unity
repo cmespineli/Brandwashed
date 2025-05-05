@@ -3350,17 +3350,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1215367182 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3862003955689445909, guid: f369b19b3e1f8c6498900a4f0ad1c4a6, type: 3}
-  m_PrefabInstance: {fileID: 1434681437}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfba20348b72980469d4fbbc5e231da2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1220800410 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4207539659473757024, guid: 3bccf50f92203f047b9beb19701f555e, type: 3}
@@ -3822,19 +3811,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5574839439594470670, guid: f369b19b3e1f8c6498900a4f0ad1c4a6, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5574839439594470670, guid: f369b19b3e1f8c6498900a4f0ad1c4a6, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1215367182}
+      objectReference: {fileID: 1469547744}
     - target: {fileID: 5574839439594470670, guid: f369b19b3e1f8c6498900a4f0ad1c4a6, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SceneTransition
+      value: ExitToMainMenu
       objectReference: {fileID: 0}
     - target: {fileID: 5574839439594470670, guid: f369b19b3e1f8c6498900a4f0ad1c4a6, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: GoToNextLevel, Assembly-CSharp
+      value: PauseManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 7621023655207905226, guid: f369b19b3e1f8c6498900a4f0ad1c4a6, type: 3}
       propertyPath: m_Pivot.x
@@ -4045,6 +4034,17 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1469547744 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3056008625563846451, guid: f369b19b3e1f8c6498900a4f0ad1c4a6, type: 3}
+  m_PrefabInstance: {fileID: 1434681437}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ba6c0577d0a09249a40929b519863aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1532537310
 GameObject:
   m_ObjectHideFlags: 0

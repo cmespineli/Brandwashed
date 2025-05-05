@@ -8085,6 +8085,22 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void PauseManager_ResumeGame_mA9AF6D0E0DAA1E2
 		return;
 	}
 }
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void PauseManager_ExitToMainMenu_mB45CB6D632C46FB77557E8EA30E2E1D7556B2B97 (PauseManager_t84975A438A2233D672703B683A1E557962911022* __this, const RuntimeMethod* method) 
+{
+	static bool s_Il2CppMethodInitialized;
+	if (!s_Il2CppMethodInitialized)
+	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&SceneManager_tA0EF56A88ACA4A15731AF7FDC10A869FA4C698FA_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral4FC3D0604BD8B7A544D6469370BDCD7C4413033D);
+		s_Il2CppMethodInitialized = true;
+	}
+	{
+		Time_set_timeScale_mEF84EE4B2376A458387648079B426B267862D331((1.0f), NULL);
+		il2cpp_codegen_runtime_class_init_inline(SceneManager_tA0EF56A88ACA4A15731AF7FDC10A869FA4C698FA_il2cpp_TypeInfo_var);
+		SceneManager_LoadScene_mBB3DBC1601A21F8F4E8A5D68FED30EA9412F218E(_stringLiteral4FC3D0604BD8B7A544D6469370BDCD7C4413033D, NULL);
+		return;
+	}
+}
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void PauseManager_RestartGame_m337EF857B1C85AD318DE76C5AB4D13B846C39D92 (PauseManager_t84975A438A2233D672703B683A1E557962911022* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -8104,22 +8120,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void PauseManager_RestartGame_m337EF857B1C85A
 		String_t* L_1;
 		L_1 = Scene_get_name_m3C818DFA663E159274DAD823B780C7616C5E2A8C((&V_0), NULL);
 		SceneManager_LoadScene_mBB3DBC1601A21F8F4E8A5D68FED30EA9412F218E(L_1, NULL);
-		return;
-	}
-}
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void PauseManager_ExitToMainMenu_mB45CB6D632C46FB77557E8EA30E2E1D7556B2B97 (PauseManager_t84975A438A2233D672703B683A1E557962911022* __this, const RuntimeMethod* method) 
-{
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&SceneManager_tA0EF56A88ACA4A15731AF7FDC10A869FA4C698FA_il2cpp_TypeInfo_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral4FC3D0604BD8B7A544D6469370BDCD7C4413033D);
-		s_Il2CppMethodInitialized = true;
-	}
-	{
-		Time_set_timeScale_mEF84EE4B2376A458387648079B426B267862D331((1.0f), NULL);
-		il2cpp_codegen_runtime_class_init_inline(SceneManager_tA0EF56A88ACA4A15731AF7FDC10A869FA4C698FA_il2cpp_TypeInfo_var);
-		SceneManager_LoadScene_mBB3DBC1601A21F8F4E8A5D68FED30EA9412F218E(_stringLiteral4FC3D0604BD8B7A544D6469370BDCD7C4413033D, NULL);
 		return;
 	}
 }
