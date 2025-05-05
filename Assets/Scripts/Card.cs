@@ -5,6 +5,10 @@ using TMPro;
 public class Card : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI letterText;
+    [SerializeField] private Image cardImage;
+    [SerializeField] private Sprite frontSprite;
+    [SerializeField] private Sprite backSprite;
+
     private Button button;
     private string storedLetter;
     private bool isRevealed = false;
@@ -14,9 +18,9 @@ public class Card : MonoBehaviour
         button = GetComponent<Button>();
 
         if (letterText == null)
-        {
             letterText = GetComponentInChildren<TextMeshProUGUI>();
-        }
+        if (cardImage == null)
+            cardImage = GetComponent<Image>();
 
         if (button != null)
         {
@@ -46,21 +50,26 @@ public class Card : MonoBehaviour
 
         isRevealed = true;
         letterText.text = storedLetter;
+
+        if (cardImage != null && frontSprite != null)
+            cardImage.sprite = frontSprite;
+
         GameManager.instance.CardRevealed(this);
     }
 
     public void HideLetter()
     {
         isRevealed = false;
-        letterText.text = "?";
+        letterText.text = " ";
+
+        if (cardImage != null && backSprite != null)
+            cardImage.sprite = backSprite;
     }
 
     public void SetInteractable(bool interactable)
     {
         if (button != null)
-        {
             button.interactable = interactable;
-        }
     }
 
     public string GetLetter()

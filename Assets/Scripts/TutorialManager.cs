@@ -62,7 +62,7 @@ public class TutorialManager : MonoBehaviour
         }
         else
         {
-            SceneManager.LoadScene("RealGameScene");
+            SceneManager.LoadScene("03GameScene");
         }
     }
 
