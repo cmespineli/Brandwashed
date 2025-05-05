@@ -38,6 +38,10 @@ public class GameManager_Game : MonoBehaviour
     void Start()
     {
         UpdateRoundUI();
+        GameStats.roundsPassed = 0;
+        GameStats.cardPairsMatched = 0;
+        GameStats.riddlesSolved = 0;
+
         riddleManager.LoadNewRiddle();
         riddleManager.StartCardPhase();
     }
@@ -106,6 +110,7 @@ public class GameManager_Game : MonoBehaviour
             firstCard.gameObject.SetActive(false);
             secondCard.gameObject.SetActive(false);
             matchCount++;
+            GameStats.cardPairsMatched++;
 
             if (matchCount >= 5)
             {
@@ -149,9 +154,17 @@ public class GameManager_Game : MonoBehaviour
         roundNumber++;
         UpdateRoundUI();
 
+        GameStats.roundsPassed = roundNumber - 1;
+
         riddleManager.LoadNewRiddle();
         cardGrid.gameObject.SetActive(true);
         riddleManager.StartCardPhase();
+    }
+
+    public void SaveGameStatsBeforeEnd()
+    {
+        GameStats.finalScore = scoreManager.GetScore();
+        GameStats.totalTimeSurvived = TimerManager.instance.GetElapsedTime();
     }
 
     void UpdateRoundUI()

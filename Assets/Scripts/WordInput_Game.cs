@@ -16,6 +16,12 @@ public class WordInput_Game : MonoBehaviour
     public string correctWord;
     private int currentIndex = 0;
     private bool isChecking = false;
+    public GameObject wrongAnswerSprite;
+    public AudioSource buzzerAudio;
+    public GameObject checkmarkSprite;
+    public AudioSource successAudio;
+    public float transitionDelay = 1.5f; // delay before starting next round
+
 
     void Awake()
     {
@@ -59,29 +65,63 @@ public class WordInput_Game : MonoBehaviour
         if (attempt.ToUpper() == correctWord)
         {
             feedbackText.text = "CORRECT.";
-            ScoreManager_Game.instance.AddPoints(500); // ✅ Add riddle points
-            yield return new WaitForSeconds(2f);
+            ScoreManager_Game.instance.AddPoints(500);
 
-            // Hide riddle UI
+            // ✅ Add 30 seconds to timer
+            TimerManager.instance.AddTime(30f);
+
+            // ✅ Show checkmark
+            if (checkmarkSprite != null)
+                checkmarkSprite.SetActive(true);
+
+            // ✅ Play success sound
+            if (successAudio != null)
+                successAudio.Play();
+
+            // ✅ Wait briefly to show feedback
+            yield return new WaitForSeconds(transitionDelay);
+
+            // Hide checkmark again (optional)
+            if (checkmarkSprite != null)
+                checkmarkSprite.SetActive(false);
+
+            // ✅ Hide riddle UI
             gameObject.SetActive(false);
             GameManager_Game.instance.buttonPanel.gameObject.SetActive(false);
             GameManager_Game.instance.riddleManager.riddleText.gameObject.SetActive(false);
             inputControlsPanel.SetActive(false);
 
-            // Show cards and move on
+            // ✅ Proceed to next card-matching round
             GameManager_Game.instance.cardGrid.gameObject.SetActive(true);
             GameManager_Game.instance.StartNextRound();
         }
         else
         {
             feedbackText.text = "REDACTED.";
+
+            // ❌ Show wrong answer sprite
+            if (wrongAnswerSprite != null)
+                wrongAnswerSprite.SetActive(true);
+
+            // 🔊 Play buzzer sound
+            if (buzzerAudio != null)
+                buzzerAudio.Play();
+
             HPManager_Game.instance.TakeDamage();
+
             yield return new WaitForSeconds(2f);
+
+            // ❌ Hide the wrong answer sprite
+            if (wrongAnswerSprite != null)
+                wrongAnswerSprite.SetActive(false);
+
             feedbackText.text = "";
         }
 
+
         isChecking = false;
     }
+
 
     public void ResetInput()
     {

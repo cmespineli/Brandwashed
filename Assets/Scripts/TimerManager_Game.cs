@@ -1,6 +1,7 @@
-// TimerManager.cs
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class TimerManager : MonoBehaviour
 {
@@ -10,6 +11,10 @@ public class TimerManager : MonoBehaviour
     private float currentTime;
     public TMP_Text timerText;
     private bool timerActive = true;
+    public GameObject timesUpImage;
+    public float delayBeforeGameOver = 2f;
+    public AudioSource timesUpAudio;
+
 
     void Awake()
     {
@@ -52,9 +57,37 @@ public class TimerManager : MonoBehaviour
         UpdateTimerUI();
     }
 
+    public void AddTime(float seconds)
+    {
+        currentTime += seconds;
+        UpdateTimerUI();
+    }
+
     void GameOver()
     {
-        Debug.Log("Time's up! Game Over.");
-        // Add your game over handling here
+        Debug.Log("Time's up! Game Over");
+
+        if (timesUpImage != null)
+            timesUpImage.SetActive(true);
+
+        if (timesUpAudio != null)
+            timesUpAudio.Play();
+
+        GameManager_Game.instance.SaveGameStatsBeforeEnd();
+
+        StartCoroutine(DelayedGameOver());
     }
-} 
+
+    public float GetElapsedTime()
+    {
+        return maxTime - currentTime;
+    }
+
+
+
+    IEnumerator DelayedGameOver()
+    {
+        yield return new WaitForSeconds(delayBeforeGameOver);
+        SceneManager.LoadScene("07EndScreen");
+    }
+}
